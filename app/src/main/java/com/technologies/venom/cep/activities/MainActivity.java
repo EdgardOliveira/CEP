@@ -2,9 +2,13 @@ package com.technologies.venom.cep.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -22,15 +26,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private final String URL = "https://viacep.com.br/ws/";
+
     private Retrofit retrofitCEP;
     private Button btnConsultarCEP;
     private TextInputEditText txtCEP, txtLogradouro, txtComplemento, txtBairro, txtUF, txtLocalidade;
-    private final String URL = "https://viacep.com.br/ws/";
+    private TextInputLayout layCEP;
+    private ProgressBar progressBarCEP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        layCEP = findViewById(R.id.txtinplayCEP);
         txtCEP = findViewById(R.id.txtinpedtCEP);
         txtLogradouro = findViewById(R.id.txtinpedtLogradouro);
         txtComplemento = findViewById(R.id.txtinpedtComplemento);
@@ -38,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         txtUF = findViewById(R.id.txtinpedtUF);
         txtLocalidade = findViewById(R.id.txtinpedtLocalidade);
         btnConsultarCEP = findViewById(R.id.btnConsultarCEP);
+        progressBarCEP = findViewById(R.id.progressBarCEP);
+
+        //configurando como invisível
+        progressBarCEP.setVisibility(View.GONE);
 
         //Aplicando a máscara para CEP
         txtCEP.addTextChangedListener(Mascara.insert(Mascara.MASCARA_CEP, txtCEP));
@@ -51,13 +63,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnConsultarCEP.setOnClickListener(this);
     }
 
+    private Boolean validarCampos(){
+
+        Boolean status = true;
+        String cep = txtCEP.getText().toString().trim();
+
+        if (cep.isEmpty()){
+            txtCEP.setError("Digite um CEP válido.");
+            status = false;
+        }
+
+        if ((cep.length()>1)&&(cep.length()<10)){
+            txtCEP.setError("O CEP deve possuir 8 dígitos");
+            status = false;
+        }
+        return status;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnConsultarCEP:
-                consultarCEP();
+                esconderTeclado();
+                if (validarCampos())
+                    consultarCEP();
                 break;
         }
+    }
+
+    private void esconderTeclado(){
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void consultarCEP(){
@@ -72,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //passando os dados para consulta
         Call<CEP> call = restService.consultarCEP(sCep);
 
+        //exibindo a progressbar
+        progressBarCEP.setVisibility(View.VISIBLE);
+
         //colocando a requisição na fila para execução
         call.enqueue(new Callback<CEP>() {
             @Override
@@ -85,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     txtLocalidade.setText(cep.getLocalidade());
                     Toast.makeText(getApplicationContext(), "CEP consultado com sucesso", Toast.LENGTH_LONG).show();
 
+                    //escondendo a progressbar
+                    progressBarCEP.setVisibility(View.GONE);
+
                     //TODO desabilitar escrita nos campos com preenchimento automático
                 }
             }
@@ -92,6 +137,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(Call<CEP> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), "Ocorreu um erro ao tentar consultar o CEP. Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
+
+                //escondendo a progressbar
+                progressBarCEP.setVisibility(View.GONE);
             }
         });
     }
