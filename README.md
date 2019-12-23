@@ -1,2 +1,21 @@
 # CEP
- App exemplo de consumo da API do ViaCEP através do Retrofit2
+ Este é um App de exemplo de como consumir dados da API ViaCEP para consulta de endereços fornecendo CEP
+
+# Ambiente de Desenvolvimento 
+ O programa foi desenvolvido utilizando:
+	- Android Studio 3.5
+	- Retrofit 2.7
+
+# Referencias
+	ViaCEP
+	https://viacep.com.br/
+	
+	Retrofit
+	https://square.github.io/retrofit/
+	
+#Telas
+![Configuração da consulta](https://github.com/EdgardOliveira/CEP/imagens/consulta01.png)
+
+![Resultado da Consulta](https://github.com/EdgardOliveira/CEP/imagens/consulta02.png)
+
+![Funcionando](https://github.com/EdgardOliveira/CEP/imagens/CEP.gif)
