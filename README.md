@@ -14,8 +14,8 @@
 	https://square.github.io/retrofit/
 	
 #Telas
-![Configuração da consulta](https://github.com/EdgardOliveira/CEP/imagens/consulta01.png)
+![Configuração da consulta](https://github.com/EdgardOliveira/CEP/tree/master/imagens/consulta01.png)
 
-![Resultado da Consulta](https://github.com/EdgardOliveira/CEP/imagens/consulta02.png)
+![Resultado da Consulta](https://github.com/EdgardOliveira/CEP/tree/master/imagens/consulta02.png)
 
-![Funcionando](https://github.com/EdgardOliveira/CEP/imagens/CEP.gif)
+![Funcionando](https://github.com/EdgardOliveira/CEP/tree/master/imagens/CEP.gif)
