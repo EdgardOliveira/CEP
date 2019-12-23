@@ -1,5 +1,7 @@
 # CEP
  Este é um App de exemplo de como consumir dados da API ViaCEP para consulta de endereços fornecendo CEP
+ 
+ ![Funcionando](https://github.com/EdgardOliveira/CEP/blob/master/imagens/CEP.gif)
 
 # Ambiente de Desenvolvimento 
  O programa foi desenvolvido utilizando:
@@ -17,5 +19,3 @@
 ![Configuração da consulta](https://github.com/EdgardOliveira/CEP/blob/master/imagens/consulta01.png)
 
 ![Resultado da Consulta](https://github.com/EdgardOliveira/CEP/blob/master/imagens/consulta02.png)
-
-![Funcionando](https://github.com/EdgardOliveira/CEP/blob/master/imagens/CEP.gif)
