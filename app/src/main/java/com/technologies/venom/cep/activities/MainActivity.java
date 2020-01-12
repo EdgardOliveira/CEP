@@ -84,9 +84,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnConsultarCEP:
-                esconderTeclado();
-                if (validarCampos())
+                if (validarCampos()){
+                    esconderTeclado();
                     consultarCEP();
+                }
                 break;
         }
     }
