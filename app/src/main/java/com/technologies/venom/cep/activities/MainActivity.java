@@ -25,73 +25,124 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final String URL = "http://localhost:9090/datasnap/rest/TSM/";
+    private final String URL = "https://viacep.com.br/ws/";
 
-    private Retrofit retrofit;
-    private Button btnConsultar;
-    private TextInputLayout lay;
-    private ProgressBar progressBar;
+    private Retrofit retrofitCEP;
+    private Button btnConsultarCEP;
+    private TextInputEditText txtCEP, txtLogradouro, txtComplemento, txtBairro, txtUF, txtLocalidade;
+    private TextInputLayout layCEP;
+    private ProgressBar progressBarCEP;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        lay = findViewById(R.id.txtinplayCEP);
-        btnConsultar = findViewById(R.id.btnConsultarCEP);
-        progressBar = findViewById(R.id.progressBarCEP);
+        layCEP = findViewById(R.id.txtinplayCEP);
+        txtCEP = findViewById(R.id.txtinpedtCEP);
+        txtLogradouro = findViewById(R.id.txtinpedtLogradouro);
+        txtComplemento = findViewById(R.id.txtinpedtComplemento);
+        txtBairro = findViewById(R.id.txtinpedtBairro);
+        txtUF = findViewById(R.id.txtinpedtUF);
+        txtLocalidade = findViewById(R.id.txtinpedtLocalidade);
+        btnConsultarCEP = findViewById(R.id.btnConsultarCEP);
+        progressBarCEP = findViewById(R.id.progressBarCEP);
 
         //configurando como invisível
-        progressBar.setVisibility(View.GONE);
+        progressBarCEP.setVisibility(View.GONE);
+
+        //Aplicando a máscara para CEP
+        txtCEP.addTextChangedListener(Mascara.insert(Mascara.MASCARA_CEP, txtCEP));
 
         //configura os recursos do retrofit
-        retrofit = new Retrofit.Builder()
+        retrofitCEP = new Retrofit.Builder()
                 .baseUrl(URL)                                       //endereço do webservice
                 .addConverterFactory(GsonConverterFactory.create()) //conversor
                 .build();
 
-        btnConsultar.setOnClickListener(this);
+        btnConsultarCEP.setOnClickListener(this);
+    }
+
+    private Boolean validarCampos() {
+
+        Boolean status = true;
+        String cep = txtCEP.getText().toString().trim();
+
+        if (cep.isEmpty()) {
+            txtCEP.setError("Digite um CEP válido.");
+            status = false;
+        }
+
+        if ((cep.length() > 1) && (cep.length() < 10)) {
+            txtCEP.setError("O CEP deve possuir 8 dígitos");
+            status = false;
+        }
+        return status;
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btnConsultarCEP:
-                consultarOrdemServico();
+                if (validarCampos()) {
+                    esconderTeclado();
+                    consultarCEP();
+                }
                 break;
         }
     }
 
-    private void consultarOrdemServico(){
+    private void esconderTeclado() {
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    private void consultarCEP() {
+        String sCep = txtCEP.getText().toString().trim();
+
+        //removendo o ponto e o traço do padrão CEP
+        sCep = sCep.replaceAll("[.-]+", "");
 
         //instanciando a interface
-        RESTService restService = retrofit.create(RESTService.class);
+        RESTService restService = retrofitCEP.create(RESTService.class);
 
         //passando os dados para consulta
-        Call<OrdemServico> call = restService.consultarOrdemServico();
+        Call<CEP> call = restService.consultarCEP(sCep);
 
         //exibindo a progressbar
-        progressBar.setVisibility(View.VISIBLE);
+        progressBarCEP.setVisibility(View.VISIBLE);
 
         //colocando a requisição na fila para execução
-        call.enqueue(new Callback<OrdemServico>() {
+        call.enqueue(new Callback<CEP>() {
             @Override
-            public void onResponse(Call<OrdemServico> call, Response<OrdemServico> response) {
-                if (response.isSuccessful()){
-                    OrdemServico ordemServico = response.body();
-                    Toast.makeText(getApplicationContext(), "OS consultado com sucesso", Toast.LENGTH_LONG).show();
+            public void onResponse(Call<CEP> call, Response<CEP> response) {
+                if (response.isSuccessful()) {
+                    CEP cep = response.body();
+                    txtLogradouro.setText(cep.getLogradouro());
+                    txtComplemento.setText(cep.getComplemento());
+                    txtBairro.setText(cep.getBairro());
+                    txtUF.setText(cep.getUf());
+                    txtLocalidade.setText(cep.getLocalidade());
+                    Toast.makeText(getApplicationContext(), "CEP consultado com sucesso", Toast.LENGTH_LONG).show();
 
                     //escondendo a progressbar
-                    progressBar.setVisibility(View.GONE);                }
+                    progressBarCEP.setVisibility(View.GONE);
+
+                    //TODO desabilitar escrita nos campos com preenchimento automático
+                }
             }
 
             @Override
-            public void onFailure(Call<OrdemServico> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Ocorreu um erro ao tentar consultar OS. Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            public void onFailure(Call<CEP> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Ocorreu um erro ao tentar consultar o CEP. Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
 
                 //escondendo a progressbar
-                progressBar.setVisibility(View.GONE);
+                progressBarCEP.setVisibility(View.GONE);
             }
         });
     }
