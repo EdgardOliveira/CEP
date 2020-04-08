@@ -10,7 +10,7 @@
 	- Retrofit 2.7.0
 
 
-# Referencias
+# Referências
 	ViaCEP
 	https://viacep.com.br/
 	
