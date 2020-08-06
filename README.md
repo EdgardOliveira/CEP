@@ -1,8 +1,8 @@
 # CEP
  Este é um App de exemplo de como consumir dados da API ViaCEP para consulta de endereços fornecendo apenas o CEP
  
- ![Funcionando](https://github.com/EdgardOliveira/CEP/blob/master/imagens/CEP.gif)
 
+<img src="https://github.com/EdgardOliveira/CEP/blob/master/imagens/CEP.gif" alt="mobile"  height="500" width="300">
 
 # Ambiente de Desenvolvimento 
  O programa foi desenvolvido utilizando:
